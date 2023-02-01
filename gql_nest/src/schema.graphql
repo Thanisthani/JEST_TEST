@@ -1,0 +1,26 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CreateUserOutput {
+  message: String!
+}
+
+type LoggedInUserOutput {
+  accessToken: String
+}
+
+type ProtectRouteOutput {
+  username: String
+}
+
+type Query {
+  refreshTokenResolver: LoggedInUserOutput!
+  protectedRouteResolver: ProtectRouteOutput!
+}
+
+type Mutation {
+  loginUserResolver(email: String!, password: String!): LoggedInUserOutput!
+  registerUserResolver(username: String!, email: String!, password: String!): LoggedInUserOutput!
+  logoutUserResolver: CreateUserOutput!
+}
