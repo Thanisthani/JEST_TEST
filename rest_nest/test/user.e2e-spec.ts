@@ -31,7 +31,7 @@ describe('AppController (e2e)', () => {
   test('Register user route test', async () => {
     const response = await request(app.getHttpServer())
         .post("/user/register")
-        .send({ username:'test26',email: "test26s@gmail.com", password: "123456" });
+        .send({ name:'test',email: "test@gmail.com", password: "123456" });
         const cookies = response.headers['set-cookie']
     refreshToken = cookies[0];
     
@@ -45,7 +45,7 @@ describe('AppController (e2e)', () => {
   test('Login user route test', async () => {
     const response = await request(app.getHttpServer())
       .post("/user/login")
-      .send({ email: "test25@gmail.com", password: "123456" });
+      .send({ email: "test@gmail.com", password: "123456" });
     const cookies = response.headers['set-cookie']
     refreshToken = cookies[0];
       
@@ -76,7 +76,7 @@ describe('AppController (e2e)', () => {
     
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
-      username: expect.any(String)
+      name: expect.any(String)
     });
   });
   
@@ -93,36 +93,36 @@ describe('AppController (e2e)', () => {
   test('should response user friendly error if user\'s email is already registered ', async () => {
     const response = await request(app.getHttpServer())
       .post("/user/register")
-      .send({ username:'test25',email: "test25@gmail.com", password: "123456" });
+      .send({ name:'test',email: "test@gmail.com", password: "123456" });
   
-    expect(response.body.error).toEqual('Email Already Registered');
+    expect(response.body.error.message).toEqual('Email Already Registered');
   });
 
-  // Register user controller error test case
+  // Register user controller error test case- only for keycloak
   test('should response user friendly error if user\'s username is already registered ', async () => {
     const response = await request(app.getHttpServer())
       .post("/user/register")
-      .send({ username:'test25',email: "test25sss@gmail.com", password: "123456" });
+      .send({ name:'test',email: "testsss@gmail.com", password: "123456" });
   
-    expect(response.body.error).toEqual('Username Already Registered');
+    expect(response.body.error.message).toEqual('Username Already Registered');
   });
 
   // Login user controller error test case
   test('should response user friendly error if user\'s password is incorrect', async () => {
     const response = await request(app.getHttpServer())
       .post("/user/login")
-      .send({ email: "test5@gmail.com", password: "123456e" });
+      .send({ email: "test@gmail.com", password: "123456e" });
   
-    expect(response.body.error).toEqual('User not found');;
+    expect(response.body.error.message).toEqual('User not found');;
   });
 
   // Login user controller error test case
   test('should response user friendly error if user\'s email isn\'t registered ', async () => {
     const response = await request(app.getHttpServer())
       .post("/user/login")
-      .send({ email: "test5d@gmail.com", password: "123456" });
+      .send({ email: "testd@gmail.com", password: "123456" });
       
-    expect(response.body.error).toEqual('User not found');
+    expect(response.body.error.message).toEqual('User not found');
   });
 });
 

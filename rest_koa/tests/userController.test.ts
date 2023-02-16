@@ -1,21 +1,31 @@
 import request  from 'supertest';
 import { app, server } from '../src/app'
+import mongoose from 'mongoose';//mongoose
+import { connection } from '../src/database/connection';//typeorm
 
 describe('Test the user controller', () => {
 
     let refreshToken: string;
     let accessToken: string;
 
-    afterAll(done => {
-        done();
+    afterAll(async() => {
         server.close();
+         // for mongoose
+         mongoose.disconnect();
+        
+         // For type orm
+        const conn = await connection();
+        conn.close();
+
+        // We don't need to disconnect the database when using Dynamoose, as the database will automatically disconnect when the server is closed.
+         
     });
     
     // Register user controller test case
     test('Register user route test', async () => {
         const response = await request(app.callback())
             .post("/user/register")
-            .send({ name:'jwt4',email: "jwt4@gmail.com", password: "123456" });
+            .send({ name:'test',email: "test@gmail.com", password: "123456" });
             const cookies = response.headers['set-cookie']
         refreshToken = cookies[0];
         
@@ -30,7 +40,7 @@ describe('Test the user controller', () => {
     test('Login user route test', async () => {
         const response = await request(app.callback())
             .post("/user/login")
-            .send({ email: "jwt3@gmail.com", password: "123456" });
+            .send({ email: "test@gmail.com", password: "123456" });
             const cookies = response.headers['set-cookie']
         refreshToken = cookies[0];
         
@@ -60,6 +70,9 @@ describe('Test the user controller', () => {
             .set('Authorization', `Bearer ${accessToken}`);
     
         expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+            name: expect.any(String)
+          });
 
     });
 
@@ -77,20 +90,20 @@ describe('Test the user controller', () => {
     test('should response user friendly error if user\'s email is already registered ', async () => {
         const response = await request(app.callback())
             .post("/user/register")
-            .send({ username: 'test20', email: "test20@gmail.com", password: "123456" });
+            .send({ username: 'test', email: "test@gmail.com", password: "123456" });
         
-        expect(response.body.error).toEqual('Email Already Registered');
+        expect(response.body.error.message).toEqual('Email Already Registered');
 
     });
     
     
-    // Login user controller error test case
+    // Login user controller error test case 
       test('should response user friendly error if user\'s password is incorrect', async () => {
         const response = await request(app.callback())
             .post("/user/login")
-            .send({ email: "jwt3@gmail.com", password: "123456e" });
+            .send({ email: "test@gmail.com", password: "123456e" });
         
-        expect(response.body.error).toEqual('Incorrect Password');
+        expect(response.body.error.message).toEqual('Incorrect Password');
 
       });
     
@@ -98,9 +111,9 @@ describe('Test the user controller', () => {
          test('should response user friendly error if user\'s email isn\'t registered ', async () => {
             const response = await request(app.callback())
                 .post("/user/login")
-                .send({ email: "test5d@gmail.com", password: "123456" });
+                .send({ email: "testd@gmail.com", password: "123456" });
             
-            expect(response.body.error).toEqual('User not found');
+            expect(response.body.error.message).toEqual('User not found');
     
          });
     

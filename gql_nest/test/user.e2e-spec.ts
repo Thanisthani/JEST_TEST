@@ -32,7 +32,7 @@ describe('AppController (e2e)', () => {
             .post("/graphql")
             .send({
                 query:
-                    'mutation {registerUserResolver(username:"test52",email: "test52@gmail.com", password: "123456") { accessToken}}',
+                    'mutation {registerUserResolver(name:"test52",email: "test52@gmail.com", password: "123456") { accessToken}}',
             });
         const cookies = response.headers['set-cookie']
         refreshToken = cookies[0];
@@ -78,10 +78,12 @@ describe('AppController (e2e)', () => {
     test('Protected route test', async () => {
         const response = await request(app.getHttpServer())
             .post("/graphql")
-            .send({ query: '{protectedRouteResolver {username}}' })
+            .send({ query: '{protectedRouteResolver {name}}' })
             .set('Authorization', `Bearer ${accessToken}`);
         expect(response.status).toBe(200);
-        console.log(response.body.data)
+        expect(response.body.data.protectedRouteResolver).toEqual({
+            name: expect.any(String)
+        });
     });
   
    // Logout user controller test case
@@ -103,20 +105,20 @@ describe('AppController (e2e)', () => {
            .post("/graphql")
            .send({
                query:
-                   'mutation {registerUserResolver(username:"test50",email: "test50@gmail.com", password: "123456") { accessToken}}',
+                   'mutation {registerUserResolver(name:"test50",email: "test50@gmail.com", password: "123456") { accessToken}}',
            });
        
        expect(response.body.errors[0].message).toEqual('Email Already Registered');
 
    });
   
-   // Register user controller error test case
+   // Register user controller error test case - only for keycloak
    test('should response user friendly error if user\'s username is already registered ', async () => {
        const response = await request(app.getHttpServer())
            .post("/graphql")
            .send({
                query:
-                   'mutation {registerUserResolver(username:"test50",email: "test50xx@gmail.com", password: "123456") { accessToken}}',
+                   'mutation {registerUserResolver(name:"test50",email: "test50xx@gmail.com", password: "123456") { accessToken}}',
            });
        
        expect(response.body.errors[0].message).toEqual('Username Already Registered');
