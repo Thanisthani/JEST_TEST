@@ -1,7 +1,7 @@
 import request  from 'supertest';
 import { app, server } from '../src/app'
 import mongoose from 'mongoose';//mongoose
-import { connection } from '../src/database/connection';//typeorm
+import { getConnection } from 'typeorm';//typeorm
 
 describe('Test the user controller', () => {
 
@@ -13,9 +13,9 @@ describe('Test the user controller', () => {
          // for mongoose
          mongoose.disconnect();
         
-         // For type orm
-        const conn = await connection();
-        conn.close();
+        // For typeorm
+        const conn = getConnection();
+        await conn.close();
 
         // We don't need to disconnect the database when using Dynamoose, as the database will automatically disconnect when the server is closed.
          
